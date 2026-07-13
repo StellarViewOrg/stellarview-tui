@@ -4,12 +4,12 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - "services/tui-indexer/**"
+      - "tui-indexer/**"
       - ".github/workflows/tui-indexer-ci.yml"
   pull_request:
     branches: [main, develop]
     paths:
-      - "services/tui-indexer/**"
+      - "tui-indexer/**"
       - ".github/workflows/tui-indexer-ci.yml"
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: services/tui-indexer
+        working-directory: tui-indexer
 
     services:
       postgres:
@@ -45,8 +45,8 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: services/tui-indexer/go.mod
-          cache-dependency-path: services/tui-indexer/go.sum
+          go-version-file: tui-indexer/go.mod
+          cache-dependency-path: tui-indexer/go.sum
 
       - name: Verify dependencies
         run: go mod verify

@@ -4,14 +4,12 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - "apps/tui/**"
-      - "package.json"
+      - "tui/**"
       - ".github/workflows/tui-ci.yml"
   pull_request:
     branches: [main, develop]
     paths:
-      - "apps/tui/**"
-      - "package.json"
+      - "tui/**"
       - ".github/workflows/tui-ci.yml"
 
 jobs:
@@ -20,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: apps/tui
+        working-directory: tui
 
     steps:
       - name: Checkout repository
@@ -29,8 +27,8 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: apps/tui/go.mod
-          cache-dependency-path: apps/tui/go.sum
+          go-version-file: tui/go.mod
+          cache-dependency-path: tui/go.sum
 
       - name: Verify dependencies
         run: go mod verify
