@@ -16,7 +16,7 @@ func renderHeader(snapshot app.Snapshot, width int) string {
 		}
 	}
 
-	left := titleStyle.Render(fmt.Sprintf("STELLAR TUI  %s/%s", snapshot.Profile.Network, snapshot.Profile.BackendMode))
+	left := titleStyle.Render(fmt.Sprintf("StellarView TUI  %s/%s", snapshot.Profile.Network, snapshot.Profile.BackendMode))
 	sourceState := activeDataSource(snapshot)
 	if snapshot.LiveFeed.Source.Degraded || snapshot.Lookup.Source.Degraded {
 		sourceState += "  degraded"

@@ -1,4 +1,4 @@
-name: Stellar TUI Release
+name: StellarView TUI Release
 
 on:
   push:

@@ -1,6 +1,6 @@
-# stellar-tui
+# StellarView TUI
 
-**stellar-tui** is a terminal block explorer for the Stellar network. It is designed for fast, keyboard-driven investigation: live monitoring, entity lookup, related-entity traversal, source-aware reads, and local operator context without leaving the command line.
+**StellarView TUI** is a terminal block explorer for the Stellar network. It is designed for fast, keyboard-driven investigation: live monitoring, entity lookup, related-entity traversal, source-aware reads, and local operator context without leaving the command line.
 
 The terminal interface is useful when the browser is too slow for repeated inspection, when you are already working in a shell, or when a workflow benefits from local notes, labels, bookmarks, cached activity, and predictable keyboard navigation.
 
