@@ -1,13 +1,13 @@
-# Stellar Explorer TUI Indexer
+# StellarView TUI Indexer
 
-`services/tui-indexer` is the Stellar Explorer backend dedicated to the terminal interface in `apps/tui`.
+`services/tui-indexer` is the StellarView Explorer backend dedicated to the terminal interface in `apps/tui`.
 
 It prepares Stellar network data for terminal workflows: ingestion, semantic normalization, read APIs, search, timelines, and live feed data. The service is optimized for views that need more context than a single Stellar RPC lookup can provide.
 
-## Role In Stellar Explorer
+## Role In StellarView Explorer
 
 - `apps/tui` provides the user-facing terminal experience.
-- `services/tui-indexer` provides indexed Stellar Explorer data for terminal views.
+- `services/tui-indexer` provides indexed StellarView Explorer data for terminal views.
 - Local SQLite in `apps/tui` keeps user state such as profiles, labels, notes, bookmarks, and session context.
 
 The TUI can run directly against Stellar RPC. When `services/tui-indexer` is available, the terminal gains richer entity lists, timelines, related records, search results, holders, operations, events, and live feed data.
