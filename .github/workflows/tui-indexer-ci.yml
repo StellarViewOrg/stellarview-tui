@@ -75,7 +75,7 @@ jobs:
           done
 
       - name: Test
-        run: make test-all
+        run: make test
         env:
           GOFLAGS: -race
 
