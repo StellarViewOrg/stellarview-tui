@@ -3,18 +3,12 @@ name: TUI Indexer CI
 on:
   push:
     branches: [main, develop]
-    paths:
-      - "tui-indexer/**"
-      - ".github/workflows/tui-indexer-ci.yml"
   pull_request:
     branches: [main, develop]
-    paths:
-      - "tui-indexer/**"
-      - ".github/workflows/tui-indexer-ci.yml"
 
 jobs:
   ci:
-    name: Build, Lint & Test
+    name: Build, Lint & Test (tui-indexer)
     runs-on: ubuntu-latest
     defaults:
       run:
