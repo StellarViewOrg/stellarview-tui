@@ -3,18 +3,12 @@ name: TUI CI
 on:
   push:
     branches: [main, develop]
-    paths:
-      - "tui/**"
-      - ".github/workflows/tui-ci.yml"
   pull_request:
     branches: [main, develop]
-    paths:
-      - "tui/**"
-      - ".github/workflows/tui-ci.yml"
 
 jobs:
   ci:
-    name: Build, Lint & Test
+    name: Build, Lint & Test (client)
     runs-on: ubuntu-latest
     defaults:
       run:
