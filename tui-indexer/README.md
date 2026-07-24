@@ -1,16 +1,16 @@
 # StellarView TUI Indexer
 
-`services/tui-indexer` is the StellarView Explorer backend dedicated to the terminal interface in `apps/tui`.
+`tui-indexer/` is the StellarView Explorer backend dedicated to the terminal interface in `tui/`.
 
 It prepares Stellar network data for terminal workflows: ingestion, semantic normalization, read APIs, search, timelines, and live feed data. The service is optimized for views that need more context than a single Stellar RPC lookup can provide.
 
 ## Role In StellarView Explorer
 
-- `apps/tui` provides the user-facing terminal experience.
-- `services/tui-indexer` provides indexed StellarView Explorer data for terminal views.
-- Local SQLite in `apps/tui` keeps user state such as profiles, labels, notes, bookmarks, and session context.
+- `tui/` provides the user-facing terminal experience.
+- `tui-indexer/` provides indexed StellarView Explorer data for terminal views.
+- Local SQLite in `tui/` keeps user state such as profiles, labels, notes, bookmarks, and session context.
 
-The TUI can run directly against Stellar RPC. When `services/tui-indexer` is available, the terminal gains richer entity lists, timelines, related records, search results, holders, operations, events, and live feed data.
+The TUI can run directly against Stellar RPC. When `tui-indexer/` is available, the terminal gains richer entity lists, timelines, related records, search results, holders, operations, events, and live feed data.
 
 ## Runtime Isolation Defaults
 
@@ -21,7 +21,7 @@ The TUI backend uses dedicated local defaults:
 - Typesense URL: `http://localhost:18118`
 - Redis channels: `tui-indexer:stream:ledgers`, `tui-indexer:stream:transactions`
 
-For local infrastructure, use the overlay at [`infra/docker-compose.tui-indexer.yml`](../../infra/docker-compose.tui-indexer.yml).
+For local infrastructure, use the overlay at [`infra/docker-compose.tui-indexer.yml`](../infra/docker-compose.tui-indexer.yml).
 
 The service ingests Stellar network data into PostgreSQL and can publish real-time events through Redis. It supports Stellar RPC for live and range ingestion, plus the Stellar public data lake for public-network historical backfill.
 
@@ -40,7 +40,7 @@ This starts PostgreSQL+TimescaleDB (port 54330), Redis (port 63890), and Typesen
 - Database migrations applied:
 
 ```bash
-# from services/tui-indexer/
+# from tui-indexer/
 make build
 ./bin/tui-indexer migrate
 ```
@@ -165,7 +165,7 @@ WORKER_COUNT=16 ./bin/tui-indexer s3backfill --start 3 --end 5000000
 
 ## Migrations
 
-Migrations live in `services/tui-indexer/migrations/` and are embedded in the binary at build time.
+Migrations live in `tui-indexer/migrations/` and are embedded in the binary at build time.
 
 ### Running migrations
 
@@ -189,7 +189,7 @@ Then run:
 migrate create -ext sql -dir migrations -seq your_description
 ```
 
-This generates two files in `services/tui-indexer/migrations/`:
+This generates two files in `tui-indexer/migrations/`:
 
 ```
 000014_your_description.up.sql    # forward change (CREATE TABLE, ALTER TABLE, etc.)
