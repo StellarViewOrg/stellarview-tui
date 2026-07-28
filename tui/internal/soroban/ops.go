@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/backendclient"
-	"github.com/miguelnietoa/stellar-explorer/tui/internal/sordecode"
+	"github.com/miguelnietoa/stellar-explorer/sordecode"
 	"github.com/stellar/go-stellar-sdk/xdr"
 )
 

@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/miguelnietoa/stellar-explorer/tui/internal/sordecode"
+	"github.com/miguelnietoa/stellar-explorer/sordecode"
 )
 
 func testdataPath(t *testing.T, name string) string {
@@ -16,7 +16,7 @@ func testdataPath(t *testing.T, name string) string {
 	if !ok {
 		t.Fatal("runtime caller failed")
 	}
-	return filepath.Join(filepath.Dir(file), "..", "sordecode", "testdata", name)
+	return filepath.Join(filepath.Dir(file), "..", "..", "..", "sordecode", "testdata", name)
 }
 
 func loadWASMFixture(t *testing.T, name string) []byte {

@@ -6,8 +6,9 @@ require (
 	github.com/BurntSushi/toml v1.6.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/miguelnietoa/stellar-explorer/sordecode v0.0.0
 	github.com/redis/go-redis/v9 v9.20.1
-	github.com/stellar/go-stellar-sdk v0.5.0
+	github.com/stellar/go-stellar-sdk v0.6.0
 	modernc.org/sqlite v1.52.0
 )
 
@@ -52,7 +53,7 @@ require (
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/smartystreets/goconvey v1.8.1 // indirect
-	github.com/stellar/go-xdr v0.0.0-20260312225820-cc2b0611aabf // indirect
+	github.com/stellar/go-xdr v0.0.0-20260529210834-0bf8f4956364 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -75,3 +76,5 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
+
+replace github.com/miguelnietoa/stellar-explorer/sordecode => ../sordecode
