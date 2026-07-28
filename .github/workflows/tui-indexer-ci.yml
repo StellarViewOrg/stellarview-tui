@@ -40,7 +40,9 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: tui-indexer/go.mod
-          cache-dependency-path: tui-indexer/go.sum
+          cache-dependency-path: |
+            tui-indexer/go.sum
+            sordecode/go.sum
 
       - name: Verify dependencies
         run: go mod verify

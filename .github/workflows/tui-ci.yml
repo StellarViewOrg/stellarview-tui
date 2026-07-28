@@ -22,7 +22,13 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: tui/go.mod
-          cache-dependency-path: tui/go.sum
+          cache-dependency-path: |
+            tui/go.sum
+            sordecode/go.sum
+
+      - name: Test shared sordecode module
+        working-directory: sordecode
+        run: go test ./...
 
       - name: Verify dependencies
         run: go mod verify
