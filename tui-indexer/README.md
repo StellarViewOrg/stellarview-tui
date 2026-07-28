@@ -1,64 +1,42 @@
 # StellarView TUI Indexer
 
-`services/tui-indexer` is the StellarView Explorer backend dedicated to the terminal interface in `apps/tui`.
+`tui-indexer` is the StellarView Explorer backend dedicated to the terminal interface in `tui`.
 
 It prepares Stellar network data for terminal workflows: ingestion, semantic normalization, read APIs, search, timelines, and live feed data. The service is optimized for views that need more context than a single Stellar RPC lookup can provide.
 
 ## Role In StellarView Explorer
 
-- `apps/tui` provides the user-facing terminal experience.
-- `services/tui-indexer` provides indexed StellarView Explorer data for terminal views.
-- Local SQLite in `apps/tui` keeps user state such as profiles, labels, notes, bookmarks, and session context.
+- `tui` provides the user-facing terminal experience.
+- `tui-indexer` provides indexed StellarView Explorer data for terminal views.
+- Local SQLite in `tui` keeps user state such as profiles, labels, notes, bookmarks, and session context.
 
-The TUI can run directly against Stellar RPC. When `services/tui-indexer` is available, the terminal gains richer entity lists, timelines, related records, search results, holders, operations, events, and live feed data.
+The TUI can run directly against Stellar RPC. When `tui-indexer` is available, the terminal gains richer entity lists, timelines, related records, search results, holders, operations, events, and live feed data.
 
 ## Runtime Isolation Defaults
 
 The TUI backend uses dedicated local defaults:
 
-- PostgreSQL database: `stellar_explorer_tui` on local port `54330`
-- Redis URL: `redis://localhost:63890`
-- Typesense URL: `http://localhost:18118`
-- Redis channels: `tui-indexer:stream:ledgers`, `tui-indexer:stream:transactions`
+- PostgreSQL database: `stellar_explorer_tui` on local port `54330` (user: `explorer`, password: `explorer_dev`)
+- Redis on local port `63890`
+- Typesense on local port `18118`
+- Read API on `:8081`
 
-For local infrastructure, use the overlay at [`infra/docker-compose.tui-indexer.yml`](../../infra/docker-compose.tui-indexer.yml).
+These isolated ports avoid conflicts with a local StellarView Explorer development instance on standard ports.
 
-The service ingests Stellar network data into PostgreSQL and can publish real-time events through Redis. It supports Stellar RPC for live and range ingestion, plus the Stellar public data lake for public-network historical backfill.
+## Environment Variables
 
-## Prerequisites
-
-- Go 1.24+ (managed via asdf, see `.tool-versions`)
-- Docker Compose services running:
-
-```bash
-# from project root
-docker compose -f infra/docker-compose.tui-indexer.yml up -d
-```
-
-This starts PostgreSQL+TimescaleDB (port 54330), Redis (port 63890), and Typesense (port 18118).
-
-- Database migrations applied:
-
-```bash
-# from services/tui-indexer/
-make build
-./bin/tui-indexer migrate
-```
-
-## Configuration
-
-| Variable       | Default                                                                               | Required | Description                                               |
-| -------------- | ------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------- |
-| `RPC_ENDPOINT` | —                                                                                     | **Yes**  | Stellar RPC endpoint                                      |
-| `NETWORK`      | `public`                                                                              | No       | `public`, `testnet`, or `futurenet`                       |
-| `DATABASE_URL` | `postgresql://explorer:explorer_dev@localhost:54330/stellar_explorer_tui?sslmode=disable` | No   | PostgreSQL connection                                     |
-| `REDIS_URL`    | `redis://localhost:63890`                                                             | No       | Redis connection (optional — logs warning if unavailable) |
-| `SEARCH_BACKEND` | `postgres`                                                                          | No       | `postgres` for direct SQL search, `typesense` once dedicated search-index thresholds are met |
-| `TYPESENSE_URL` | `http://localhost:18118`                                                            | No       | Dedicated search service URL, used when `SEARCH_BACKEND=typesense` |
-| `TYPESENSE_KEY` | `explorer_dev_key`                                                                  | No       | Dedicated search service API key                          |
-| `READ_API_ADDR`| `:8081`                                                                               | No       | HTTP listen address for the read API server               |
-| `BATCH_SIZE`   | `100`                                                                                 | No       | Ledgers per batch                                         |
-| `WORKER_COUNT` | `8`                                                                                   | No       | Parallel workers for backfill                             |
+| Variable | Default | Required | Description |
+|----------|---------|----------|-------------|
+| `DATABASE_URL` | `postgres://explorer:explorer_dev@localhost:54330/stellar_explorer_tui?sslmode=disable` | No | PostgreSQL connection |
+| `RPC_ENDPOINT` | — | Yes | Stellar RPC URL (e.g., `https://soroban-testnet.stellar.org`) |
+| `NETWORK` | `public` | No | Network passphrase (`public`, `testnet`, `futurenet`) |
+| `REDIS_URL` | `redis://localhost:63890` | No | Redis connection (optional — logs warning if unavailable) |
+| `SEARCH_BACKEND` | `postgres` | No | `postgres` for direct SQL search, `typesense` once dedicated search-index thresholds are met |
+| `TYPESENSE_URL` | `http://localhost:18118` | No | Dedicated search service URL, used when `SEARCH_BACKEND=typesense` |
+| `TYPESENSE_KEY` | `explorer_dev_key` | No | Dedicated search service API key |
+| `READ_API_ADDR` | `:8081` | No | HTTP listen address for the read API server |
+| `BATCH_SIZE` | `100` | No | Ledgers per batch |
+| `WORKER_COUNT` | `8` | No | Parallel workers for backfill |
 
 ### Search Backend Policy
 
@@ -73,11 +51,22 @@ make build
 ```bash
 make build          # Compile to bin/tui-indexer
 make migrate        # Apply pending database migrations
-make test           # Run all tests
+make test           # Run all tests (short)
+make test-all       # Full test suite
 make fmt            # Format code
 make lint           # Run go vet
 make run-serve      # Start the read API server
+make run-live       # Start live ingestion
 make clean          # Remove bin/
+```
+
+### Local infrastructure
+
+Start Postgres, Redis, and Typesense for the TUI indexer:
+
+```bash
+cd ../infra
+docker compose -f docker-compose.tui-indexer.yml up -d
 ```
 
 ### Read API
@@ -165,7 +154,7 @@ WORKER_COUNT=16 ./bin/tui-indexer s3backfill --start 3 --end 5000000
 
 ## Migrations
 
-Migrations live in `services/tui-indexer/migrations/` and are embedded in the binary at build time.
+Migrations live in `migrations/` and are embedded in the binary at build time.
 
 ### Running migrations
 
@@ -189,7 +178,7 @@ Then run:
 migrate create -ext sql -dir migrations -seq your_description
 ```
 
-This generates two files in `services/tui-indexer/migrations/`:
+This generates two files in `migrations/`:
 
 ```
 000014_your_description.up.sql    # forward change (CREATE TABLE, ALTER TABLE, etc.)
@@ -209,7 +198,7 @@ make migrate
 To wipe all ingested data and start fresh (useful after testing with different networks or ledger ranges):
 
 ```bash
-docker compose -f infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui -c "
+docker compose -f ../infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui -c "
   TRUNCATE ledgers, transactions, operations, ingestion_state CASCADE;
 "
 ```
@@ -217,7 +206,7 @@ docker compose -f infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U
 To reset only the ingestion cursor (keeps existing data but allows re-ingestion):
 
 ```bash
-docker compose -f infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui -c "
+docker compose -f ../infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui -c "
   DELETE FROM ingestion_state;
 "
 ```
@@ -228,26 +217,26 @@ After running the indexer for a few seconds, check that data landed in PostgreSQ
 
 ```bash
 # Ledgers
-docker compose -f infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui \
+docker compose -f ../infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui \
   -c "SELECT sequence, transaction_count, operation_count, protocol_version FROM ledgers ORDER BY sequence DESC LIMIT 5;"
 
 # Transactions
-docker compose -f infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui \
+docker compose -f ../infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui \
   -c "SELECT hash, ledger_sequence, account, operation_count, is_soroban FROM transactions ORDER BY created_at DESC LIMIT 5;"
 
 # Operations
-docker compose -f infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui \
+docker compose -f ../infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui \
   -c "SELECT transaction_hash, type_name, destination, amount FROM operations ORDER BY created_at DESC LIMIT 5;"
 
 # Ingestion cursor
-docker compose -f infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui \
+docker compose -f ../infra/docker-compose.tui-indexer.yml exec postgres-tui psql -U explorer -d stellar_explorer_tui \
   -c "SELECT * FROM ingestion_state;"
 ```
 
 To verify Redis pub/sub, subscribe in one terminal:
 
 ```bash
-docker compose -f infra/docker-compose.tui-indexer.yml exec redis-tui redis-cli SUBSCRIBE tui-indexer:stream:ledgers
+docker compose -f ../infra/docker-compose.tui-indexer.yml exec redis-tui redis-cli SUBSCRIBE tui-indexer:stream:ledgers
 ```
 
 Then run the indexer in another terminal — you should see JSON messages as ledgers are ingested.
@@ -284,12 +273,12 @@ AWS S3 ─────> source/datalake.go ─────────┘       
                                                         stream:transactions)
 ```
 
-| Package              | Purpose                                                                 |
-| -------------------- | ----------------------------------------------------------------------- |
-| `cmd/indexer`        | Entry point with `live`, `backfill`, `migrate` commands                 |
-| `internal/config`    | Environment variable loading and validation                             |
-| `internal/source`    | Stellar RPC client (`getLedgers`, `getTransactions`, `getLatestLedger`) |
-| `internal/transform` | XDR parsing into database models (ledgers, transactions, operations)    |
-| `internal/store`     | PostgreSQL writer with batch inserts and ingestion cursor               |
-| `internal/pipeline`  | Live ingestion loop and parallel backfill orchestration                 |
-| `internal/publisher` | Redis pub/sub for real-time event streaming                             |
+| Package | Purpose |
+| ------- | ------- |
+| `cmd/tui-indexer` | Entry point with `live`, `backfill`, `migrate` commands |
+| `internal/config` | Environment variable loading and validation |
+| `internal/source` | Stellar RPC client (`getLedgers`, `getTransactions`, `getLatestLedger`) |
+| `internal/transform` | XDR parsing into database models (ledgers, transactions, operations) |
+| `internal/store` | PostgreSQL writer with batch inserts and ingestion cursor |
+| `internal/pipeline` | Live ingestion loop and parallel backfill orchestration |
+| `internal/publisher` | Redis pub/sub for real-time event streaming |
