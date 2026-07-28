@@ -6,7 +6,7 @@ The terminal interface is useful when the browser is too slow for repeated inspe
 
 ## Current Status
 
-**v0.1.0** is the first standalone release foundation. The client runs in RPC mode without extra local services, persists workspace state in SQLite by default, and can use the dedicated `services/tui-indexer` backend for richer indexed reads when that backend is available.
+**v0.1.0** is the first standalone release foundation. The client runs in RPC mode without extra local services, persists workspace state in SQLite by default, and can use the dedicated `tui-indexer` backend for richer indexed reads when that backend is available.
 
 Current implemented surfaces include:
 
@@ -15,7 +15,7 @@ Current implemented surfaces include:
 - source-aware lookup with fallback/degraded state labels
 - live feed browsing with Redis stream ingestion, polling fallback, replay controls, and local scrollback
 - lookup and navigation for core Stellar entities
-- indexed lists, sublists, timelines, holders, operations, and events when `services/tui-indexer` is available
+- indexed lists, sublists, timelines, holders, operations, and events when `tui-indexer` is available
 - local SQLite profiles, session state, labels, bookmarks, notes, saved views, visited entity cache, and cache fallback reads
 - in-client Soroban decode in RPC/network mode (contract spec, invoke args/results, events, instance storage)
 - first decoded/raw Soroban display paths for contract-heavy views
@@ -25,7 +25,7 @@ The roadmap documents the intended product direction. Treat features listed only
 ## Known Limitations
 
 - The TUI is not a stable release yet; command behavior and view composition may still change.
-- Hybrid mode requires `services/tui-indexer` plus its local infrastructure for indexed reads.
+- Hybrid mode requires `tui-indexer` plus its local infrastructure for indexed reads.
 - RPC mode remains intentionally narrower than indexed mode and cannot provide every list, timeline, holder, or search result.
 - RPC contract events are limited to the RPC retention window (~24h); persistent contract data scans still require `tui-indexer`.
 - Advanced live-feed filters for contract, asset, and operation type require indexed/stream metadata from `tui-indexer`; account and class filters work in all live-feed modes.
@@ -48,17 +48,11 @@ STELLAR_RPC_URL=https://soroban-testnet.stellar.org stellar-tui
 
 On first run, stellar-tui creates `~/.config/stellar-tui/config.json` and `~/.config/stellar-tui/cache.db`.
 
-### Install from source (monorepo)
-
-```bash
-bun run tui:install
-# binary lands in $(go env GOPATH)/bin/stellar-tui
-```
-
 ### Install from source (this directory)
 
 ```bash
 make install
+# binary lands in $(go env GOPATH)/bin/stellar-tui
 ```
 
 ### Build a local binary
@@ -182,9 +176,9 @@ Instead of copying identifiers between pages or repeatedly opening new views, th
 - **More efficient investigation:** keyboard navigation, command search, and related-entity jumps reduce repetitive lookup work.
 - **Local-first context:** profiles, session state, labels, bookmarks, notes, visited entities, and live-feed scrollback are stored locally in SQLite.
 - **More private workflows:** local metadata stays on the machine. Notes, labels, bookmarks, and cached investigation context do not need to be sent to a hosted UI.
-- **Clear data source visibility:** each lookup can show whether it came from Stellar RPC, `services/tui-indexer`, or an RPC fallback.
+- **Clear data source visibility:** each lookup can show whether it came from Stellar RPC, `tui-indexer`, or an RPC fallback.
 - **Useful with minimal setup:** RPC mode can run directly against Stellar RPC for basic live feed and lookup workflows.
-- **Richer with indexed data:** hybrid/indexed mode adds search, timelines, holders, operations, full contract event history, persistent storage scans, and related entity lists from `services/tui-indexer`.
+- **Richer with indexed data:** hybrid/indexed mode adds search, timelines, holders, operations, full contract event history, persistent storage scans, and related entity lists from `tui-indexer`.
 - **Terminal-native ergonomics:** the UI is optimized for repeated inspection, compact output, clipboard use, and shell-driven workflows.
 
 ## Data Modes
@@ -201,7 +195,7 @@ Use it for:
 
 ### Hybrid Mode
 
-Hybrid mode prefers `services/tui-indexer` when it can provide richer indexed data, and falls back to Stellar RPC when an indexed path is unavailable.
+Hybrid mode prefers `tui-indexer` when it can provide richer indexed data, and falls back to Stellar RPC when an indexed path is unavailable.
 
 Use it for:
 
@@ -216,95 +210,87 @@ Use it for:
 Run the default RPC profile:
 
 ```bash
-bun run tui:run
-# or: ./bin/stellar-tui
-```
-
-Equivalent explicit RPC command:
-
-```bash
-bun run tui:run:rpc
+make run
+# or: make build && ./bin/stellar-tui
 ```
 
 Render once and exit, useful for scripts or quick checks:
 
 ```bash
-bun run tui:run:once
+make run-once
 ```
 
 Run with the hybrid testnet profile:
 
 ```bash
-bun run tui:run:hybrid
-```
-
-Render the hybrid profile once and exit:
-
-```bash
-bun run tui:run:hybrid:once
+make run-hybrid
 ```
 
 Build and test:
 
 ```bash
-bun run tui:build
-bun run tui:test
+make build
+make test
 ```
 
 Optional split tiers:
 
 ```bash
-bun run tui:test:unit          # unit + fixture suite only
-bun run tui:test:integration   # integration reliability chains only
+make test-integration   # integration build-tag tests only
+make test-all           # unit + integration combined
 ```
 
-Indexer backend (only when changing `services/tui-indexer`):
+Indexer backend tests (only when changing `tui-indexer`):
 
 ```bash
-bun run tui-indexer:test       # local-safe suite (no Docker required)
-bun run tui-indexer:test:all   # full suite (requires Postgres on :54320)
+cd ../tui-indexer && make test       # local-safe suite (no Docker required)
+cd ../tui-indexer && make test-all   # full suite (requires Postgres on :54320)
 ```
 
 ### Test Tiers
 
-- `bun run tui:test` — one command for the terminal app. Runs unit + integration tests. No Stellar RPC, PostgreSQL, or Redis required.
-- `bun run tui:test:unit` — faster subset when iterating on a single package.
-- `bun run tui:test:integration` — integration build-tag tests only.
-- `bun run tui-indexer:test` — indexer unit and read API tests; skips DB/Redis/S3 integration checks unless infra is running.
-- `bun run tui-indexer:test:all` — full indexer suite including integration tests (start infra with `bun run tui-indexer:infra:up` first).
+- `make test` — the terminal app test suite. No Stellar RPC, PostgreSQL, or Redis required.
+- `make test-integration` — integration build-tag tests only.
+- `make test-all` — unit + integration combined.
+- `cd ../tui-indexer && make test` — indexer tests; skips DB/Redis/S3 integration checks unless infra is running.
+- `cd ../tui-indexer && make test-all` — full indexer suite including integration tests (start infra with `docker compose -f ../infra/docker-compose.tui-indexer.yml up -d` first).
 
 ## Hybrid Backend Setup
 
-Hybrid mode expects `services/tui-indexer` at `http://127.0.0.1:8081`, as configured in `apps/tui/config/hybrid.testnet.json`.
+Hybrid mode expects `tui-indexer` at `http://127.0.0.1:8081`, as configured in `config/hybrid.testnet.json`.
 
 Start local infrastructure:
 
 ```bash
-bun run tui-indexer:infra:up
+cd ../infra
+docker compose -f docker-compose.tui-indexer.yml up -d
 ```
 
 Apply migrations:
 
 ```bash
-bun run tui-indexer:migrate
+cd ../tui-indexer
+make migrate
 ```
 
 Start the TUI read API:
 
 ```bash
-bun run tui-indexer:run:serve
+make run-serve
 ```
 
 In another terminal, run the TUI in hybrid mode:
 
 ```bash
-bun run tui:run:hybrid
+cd ../tui
+make run-hybrid
 ```
 
 Optional: ingest live Stellar data into the TUI backend:
 
 ```bash
-RPC_ENDPOINT=https://soroban-testnet.stellar.org NETWORK=testnet bun run tui-indexer:run:live
+cd ../tui-indexer
+RPC_ENDPOINT=https://soroban-testnet.stellar.org NETWORK=testnet make run-live
 ```
 
 ## What You Can Inspect
@@ -459,4 +445,4 @@ Press `r` on the lookup screen to force a network refresh. For a full cache rese
 
 **Hybrid mode shows RPC fallback instead of indexed data**
 
-`services/tui-indexer` is either not running or unreachable at the configured `indexer_url`. Start it with `bun run tui-indexer:run:serve` and verify connectivity before switching to hybrid mode.
+`tui-indexer` is either not running or unreachable at the configured `indexer_url`. Start it with `cd ../tui-indexer && make run-serve` and verify connectivity before switching to hybrid mode.
