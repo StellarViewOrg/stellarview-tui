@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.83.0
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/lib/pq v1.11.2
+	github.com/miguelnietoa/stellar-explorer/sordecode v0.0.0
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/stellar/go-stellar-sdk v0.6.0
 	google.golang.org/protobuf v1.36.7
@@ -110,3 +111,5 @@ require (
 	gopkg.in/djherbis/stream.v1 v1.3.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/miguelnietoa/stellar-explorer/sordecode => ../sordecode

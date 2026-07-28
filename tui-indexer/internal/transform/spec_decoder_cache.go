@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/miguelnietoa/stellar-explorer/tui-indexer/internal/sordecode"
+	"github.com/miguelnietoa/stellar-explorer/sordecode"
 )
 
 // CachingSpecRegistryLoader memoizes contract spec registries for one ingest batch.

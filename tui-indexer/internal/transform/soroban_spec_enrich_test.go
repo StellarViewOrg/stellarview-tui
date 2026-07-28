@@ -10,7 +10,7 @@ import (
 	"github.com/stellar/go-stellar-sdk/strkey"
 	"github.com/stellar/go-stellar-sdk/xdr"
 
-	"github.com/miguelnietoa/stellar-explorer/tui-indexer/internal/sordecode"
+	"github.com/miguelnietoa/stellar-explorer/sordecode"
 	"github.com/miguelnietoa/stellar-explorer/tui-indexer/internal/source"
 	"github.com/miguelnietoa/stellar-explorer/tui-indexer/internal/store"
 )
@@ -112,7 +112,7 @@ func loadRegistryFromFixture(t *testing.T, fixture string) *sordecode.SpecRegist
 	if !ok {
 		t.Fatal("runtime caller failed")
 	}
-	wasmPath := filepath.Join(filepath.Dir(file), "..", "sordecode", "testdata", fixture)
+	wasmPath := filepath.Join(filepath.Dir(file), "..", "..", "..", "sordecode", "testdata", fixture)
 	wasmBytes, err := os.ReadFile(wasmPath)
 	if err != nil {
 		t.Fatalf("read wasm fixture: %v", err)

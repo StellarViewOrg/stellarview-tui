@@ -3,7 +3,7 @@ package transform
 import (
 	"context"
 
-	"github.com/miguelnietoa/stellar-explorer/tui-indexer/internal/sordecode"
+	"github.com/miguelnietoa/stellar-explorer/sordecode"
 )
 
 // ContractSpecRegistryLoader resolves contract spec registries by contract ID.
