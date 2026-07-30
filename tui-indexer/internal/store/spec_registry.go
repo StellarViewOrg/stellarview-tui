@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/miguelnietoa/stellar-explorer/tui-indexer/internal/sordecode"
+	"github.com/miguelnietoa/stellar-explorer/sordecode"
 )
 
 // GetSpecRegistryForContract loads a contract spec registry from indexed contract_code XDR.

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stellar/go-stellar-sdk/xdr"
 
-	"github.com/miguelnietoa/stellar-explorer/tui-indexer/internal/sordecode"
+	"github.com/miguelnietoa/stellar-explorer/sordecode"
 	"github.com/miguelnietoa/stellar-explorer/tui-indexer/internal/store"
 )
 

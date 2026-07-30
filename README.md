@@ -6,10 +6,11 @@ Fast, keyboard-driven investigation of Stellar and Soroban data from the shell: 
 
 ## Repository layout
 
-This repository holds two Go modules plus local infrastructure:
+This repository holds three Go modules plus local infrastructure:
 
 | Path | What it is |
 |---|---|
+| [`sordecode/`](./sordecode) | **Shared Soroban/XDR decode library** — contract spec, invoke args/results, events, and storage decoding. Consumed by both client and indexer via `replace` directives (see root `go.work` for local multi-module development). |
 | [`tui/`](./tui) | **StellarView TUI** — the terminal client (Bubble Tea + Lip Gloss). Runs standalone against Stellar RPC / Horizon, or against the indexer backend for richer reads. Local state is kept in SQLite. |
 | [`tui-indexer/`](./tui-indexer) | **StellarView TUI Indexer** — backend service that ingests Stellar data into PostgreSQL/TimescaleDB, publishes live events via Redis, and exposes a read HTTP API shaped for terminal views (lists, timelines, holders, search). |
 | [`infra/`](./infra) | Docker Compose stacks for local Postgres, Redis, and Typesense. |
