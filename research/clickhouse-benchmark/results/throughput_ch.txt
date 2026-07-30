@@ -1,0 +1,8 @@
+engine=clickhouse
+start_ledger=55000000
+end_ledger=55010000
+ledgers=10001
+workers=8
+elapsed_sec=351
+ledgers_per_sec=28.49
+exit_code=0

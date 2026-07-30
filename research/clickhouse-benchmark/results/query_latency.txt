@@ -1,0 +1,12 @@
+pg,tx_by_hash,median_ms=7.625,p95_ms=8.366,repeats=11
+pg,account_by_id,median_ms=6.756,p95_ms=8.080,repeats=11
+pg,account_history,median_ms=398.169,p95_ms=419.217,repeats=11
+pg,counts_by_day_tx,median_ms=179.386,p95_ms=220.830,repeats=11
+pg,counts_by_day_op,median_ms=261.444,p95_ms=288.678,repeats=11
+pg,top_assets,median_ms=222.846,p95_ms=224.919,repeats=11
+ch,tx_by_hash,median_ms=71.185,p95_ms=95.747,repeats=11
+ch,account_by_id,median_ms=65.190,p95_ms=76.189,repeats=11
+ch,account_history,median_ms=1636.387,p95_ms=2064.861,repeats=11
+ch,counts_by_day_tx,median_ms=82.939,p95_ms=85.843,repeats=11
+ch,counts_by_day_op,median_ms=82.160,p95_ms=96.616,repeats=11
+ch,top_assets,median_ms=146.684,p95_ms=152.260,repeats=11

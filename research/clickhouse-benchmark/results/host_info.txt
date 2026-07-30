@@ -1,0 +1,7 @@
+date_utc=2026-07-30T06:01:18Z
+uname=MINGW64_NT-10.0-26200 DESKTOP-0RPPVCJ 3.5.7-882031da.x86_64 2025-01-30 11:14 UTC x86_64 Msys
+start_ledger=55000000
+end_ledger=55010000
+workers=8
+nproc=16
+mem_total_kb=15985580

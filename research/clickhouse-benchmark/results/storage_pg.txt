@@ -1,0 +1,14 @@
+# postgres hypertable and table sizes (bytes)
+contract_events,3016482816
+ledgers,11993088
+operations,2911141888
+transactions,6301810688
+accounts,32776192,18669568,14065664
+# postgres row counts
+ledgers,10001
+accounts,59253
+transactions,2429520
+operations,4788835
+contract_events,2815553
+# timescale compression stats (may be empty for recent chunks)
+compression_stats_unavailable
