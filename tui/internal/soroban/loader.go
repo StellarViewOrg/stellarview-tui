@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/miguelnietoa/stellar-explorer/tui/internal/rpcclient"
 	"github.com/miguelnietoa/stellar-explorer/sordecode"
+	"github.com/miguelnietoa/stellar-explorer/tui/internal/rpcclient"
 	"github.com/stellar/go-stellar-sdk/xdr"
 )
 

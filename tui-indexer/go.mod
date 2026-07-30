@@ -1,6 +1,6 @@
 module github.com/miguelnietoa/stellar-explorer/tui-indexer
 
-go 1.25
+go 1.25.0
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.36.5
