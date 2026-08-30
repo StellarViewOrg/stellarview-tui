@@ -39,6 +39,7 @@ const (
 	ActionSetContractDecodeDecoded ActionKind = "set-contract-decode-decoded"
 	ActionToggleLookupExpand       ActionKind = "toggle-lookup-expand"
 	ActionToggleLookupVisual       ActionKind = "toggle-lookup-visual"
+	ActionExportLiveFeed           ActionKind = "export-live-feed"
 )
 
 type ActionMsg struct {

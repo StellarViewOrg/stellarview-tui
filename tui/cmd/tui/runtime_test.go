@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 	"testing"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/app"
@@ -220,6 +223,74 @@ func TestApplyActionPastesClipboardIntoCommandPalette(t *testing.T) {
 	}
 	if got := dashboard.CommandInput(); got != "lookup tx abc123" {
 		t.Fatalf("dashboard.CommandInput() = %q, want %q", got, "lookup tx abc123")
+	}
+}
+
+func TestApplyActionExportLiveFeedWritesFile(t *testing.T) {
+	dir := t.TempDir()
+	previousWd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Getwd() error = %v", err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatalf("Chdir() error = %v", err)
+	}
+	t.Cleanup(func() {
+		_ = os.Chdir(previousWd)
+	})
+
+	previousNow := exportNow
+	fixedNow := time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)
+	exportNow = func() time.Time { return fixedNow }
+	t.Cleanup(func() { exportNow = previousNow })
+
+	cfg := config.Default()
+	model := app.NewModel(cfg, "/tmp/config.json", app.CacheSnapshot{})
+	if err := model.SetScreen(app.ScreenLiveFeed); err != nil {
+		t.Fatalf("SetScreen() error = %v", err)
+	}
+	if err := model.RefreshLiveFeed(context.Background(), stubLiveFeedService{
+		summary: backendclient.LiveFeedSummaryResponse{
+			RecentTransactions: []backendclient.TransactionSummary{
+				{Hash: "tx-1", Account: "GACCOUNT"},
+			},
+		},
+	}); err != nil {
+		t.Fatalf("RefreshLiveFeed() error = %v", err)
+	}
+
+	dashboard := ui.NewDashboardModel(model.Snapshot(), 100, 20)
+	runtime := interactiveRuntime{}
+	keepRunning, err := runtime.applyAction(context.Background(), cfg, model, nil, &dashboard, ui.ActionMsg{Kind: ui.ActionExportLiveFeed, Text: "csv"})
+	if err != nil {
+		t.Fatalf("applyAction(export) error = %v", err)
+	}
+	if !keepRunning {
+		t.Fatal("expected runtime to keep running")
+	}
+
+	wantPath := filepath.Join(dir, "stellarview-live-feed-20260102-030405.csv")
+	if _, err := os.Stat(wantPath); err != nil {
+		t.Fatalf("expected export file at %s: %v", wantPath, err)
+	}
+
+	if got := model.Snapshot().Status.Message; got == "" {
+		t.Fatal("expected a status message after export")
+	}
+}
+
+func TestApplyActionExportLiveFeedWithoutTransactionsWarns(t *testing.T) {
+	cfg := config.Default()
+	model := app.NewModel(cfg, "/tmp/config.json", app.CacheSnapshot{})
+	dashboard := ui.NewDashboardModel(model.Snapshot(), 100, 20)
+	runtime := interactiveRuntime{}
+
+	if _, err := runtime.applyAction(context.Background(), cfg, model, nil, &dashboard, ui.ActionMsg{Kind: ui.ActionExportLiveFeed, Text: "csv"}); err != nil {
+		t.Fatalf("applyAction(export) error = %v", err)
+	}
+
+	if got := model.Snapshot().Status.Level; got != app.StatusWarn {
+		t.Fatalf("Status.Level = %v, want %v", got, app.StatusWarn)
 	}
 }
 
