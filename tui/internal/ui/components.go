@@ -429,6 +429,10 @@ func (m LiveFeedModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, actionDelta(ActionShiftLiveReplay, 1)
 		case "]", "}":
 			return m, actionDelta(ActionShiftLiveReplay, -1)
+		case "x":
+			return m, actionText(ActionExportLiveFeed, "csv")
+		case "X":
+			return m, actionText(ActionExportLiveFeed, "json")
 		}
 	}
 	return m, nil

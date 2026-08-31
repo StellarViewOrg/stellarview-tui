@@ -341,6 +341,7 @@ Explorer navigation:
 - in live feed, `enter` opens the selected transaction; `b` or `live return` restores monitoring position, filters, and pause state
 - in live feed, use `live filter account <id>`, `live filter contract <id>`, `live filter asset <code:issuer>`, or `live filter operation <type>` for advanced filters
 - in live feed, `watch save <name>` stores profile watch presets (filters and pause state); `watch open <name>` restores them
+- in live feed, `x` exports the currently visible (filtered) transactions to a timestamped CSV file in the working directory; `X` exports the same data as JSON
 
 Search and command palette:
 

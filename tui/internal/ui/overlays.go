@@ -25,7 +25,7 @@ func renderHelpOverlay(snapshot app.Snapshot, width int) string {
 		"? toggle help",
 	}
 	if snapshot.Current == app.ScreenLiveFeed {
-		lines = append(lines, "j/k or arrows move through live transactions", "pgup/pgdn and home/end move faster through the feed", "p pauses/resumes live refresh", "t cycles class filters (all/soroban/classic)", "[ and ] replay retained scrollback while paused", "left/right changes the live copy field", "enter opens the selected transaction", "b returns from a drilled-in transaction with monitoring context restored", "live filter account|contract|asset|operation <value> for advanced filters", "watch save|open|delete|auto <name> stores profile watch presets")
+		lines = append(lines, "j/k or arrows move through live transactions", "pgup/pgdn and home/end move faster through the feed", "p pauses/resumes live refresh", "t cycles class filters (all/soroban/classic)", "[ and ] replay retained scrollback while paused", "left/right changes the live copy field", "enter opens the selected transaction", "b returns from a drilled-in transaction with monitoring context restored", "live filter account|contract|asset|operation <value> for advanced filters", "watch save|open|delete|auto <name> stores profile watch presets", "x exports the current live feed view to CSV", "X exports the current live feed view to JSON")
 	}
 	if snapshot.Current == app.ScreenLookup {
 		lines = append(lines,

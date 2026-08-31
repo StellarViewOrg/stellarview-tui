@@ -14,6 +14,7 @@ import (
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/cache"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/clipboard"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/config"
+	"github.com/miguelnietoa/stellar-explorer/tui/internal/export"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/ui"
 )
 
@@ -475,9 +476,36 @@ func (r interactiveRuntime) applyAction(ctx context.Context, cfg config.Config, 
 			model.SetWarningStatus(err.Error())
 		}
 		return true, nil
+	case ui.ActionExportLiveFeed:
+		r.exportLiveFeed(model, action.Text)
+		return true, nil
 	default:
 		return true, nil
 	}
+}
+
+var exportNow = time.Now
+
+func (r interactiveRuntime) exportLiveFeed(model *app.Model, formatInput string) {
+	format, err := export.ParseFormat(formatInput)
+	if err != nil {
+		model.SetWarningStatus(err.Error())
+		return
+	}
+
+	snapshot := model.Snapshot()
+	transactions := snapshot.LiveFeed.RecentTransactions
+	if len(transactions) == 0 {
+		model.SetWarningStatus("Live feed export skipped: no transactions in the current view.")
+		return
+	}
+
+	path := export.DefaultFileName("live-feed", format, exportNow())
+	if err := export.WriteLiveFeedTransactions(path, format, transactions); err != nil {
+		model.SetWarningStatus(fmt.Sprintf("Live feed export failed: %v", err))
+		return
+	}
+	model.SetInfoStatus(fmt.Sprintf("Exported %d live feed transactions to %s", len(transactions), path))
 }
 
 func (r interactiveRuntime) submitCommandPalette(ctx context.Context, cfg config.Config, model *app.Model, dashboard *ui.DashboardModel) (bool, error) {
