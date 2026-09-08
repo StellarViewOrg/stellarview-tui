@@ -1,7 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-<<<<<<< HEAD
     "config:recommended",
     ":semanticCommits",
     "group:allNonMajor",
@@ -22,9 +21,4 @@
   "github-actions": {
     "enabled": true
   }
-||||||| 18540b3
-=======
-    "config:recommended"
-  ]
->>>>>>> origin/main
 }
