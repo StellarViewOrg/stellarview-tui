@@ -1,0 +1,85 @@
+name: Bug report
+description: Report a problem with the StellarView TUI client or its indexer backend
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill in as much detail as you can, it makes triage much faster.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - tui (terminal client)
+        - tui-indexer (backend service)
+        - sordecode (shared decode library)
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      description: Output of `stellar-tui --version`, or the git commit you built from
+      placeholder: v0.1.0 or commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: network
+    attributes:
+      label: Network
+      options:
+        - Public
+        - Testnet
+        - Futurenet
+        - Not applicable
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Data mode
+      description: How was the client running when you hit this
+      options:
+        - RPC (standalone)
+        - Hybrid (indexer with RPC fallback)
+        - Indexer
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS / terminal
+      placeholder: e.g. macOS 15, iTerm2
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `stellar-tui` with ...
+        2. Navigate to ...
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Terminal output, indexer logs, or a screenshot of the TUI
+      render: shell
