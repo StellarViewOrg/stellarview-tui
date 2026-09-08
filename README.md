@@ -64,3 +64,7 @@ StellarView is an open-source suite for exploring the Stellar network:
 - [StellarView Indexer](https://github.com/StellarViewOrg/stellarview-indexer) — data ingestion service
 - **StellarView TUI** — terminal block explorer (this repository)
 - [StellarView Docs](https://github.com/StellarViewOrg/stellarview-docs) — documentation
+
+## License
+
+Apache License 2.0. See [LICENSE](./LICENSE).
