@@ -17,15 +17,10 @@ The repository configuration enforces weekly batching, semantic commits, and mul
 ```json
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    ":semanticCommits",
-    "group:allNonMajor",
-    "schedule:weekly"
-  ],
+  "extends": ["config:recommended", ":semanticCommits", "schedule:weekly"],
   "timezone": "UTC",
   "schedule": ["before 6am on monday"],
-  "prConcurrentLimit": 5,
+  "prConcurrentLimit": 3,
   "prHourlyLimit": 2,
   "labels": ["dependencies"],
   "lockFileMaintenance": {
@@ -37,6 +32,23 @@ The repository configuration enforces weekly batching, semantic commits, and mul
   },
   "github-actions": {
     "enabled": true
+  },
+  "packageRules": [
+    {
+      "description": "Group every non-major update into one PR",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-non-major"
+    },
+    {
+      "description": "Group every major update into one PR",
+      "matchUpdateTypes": ["major"],
+      "groupName": "all major dependencies",
+      "groupSlug": "all-major"
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "groupName": "security updates"
   }
 }
 ```
@@ -46,15 +58,16 @@ The repository configuration enforces weekly batching, semantic commits, and mul
 The repository is organized as a Go workspace (`go.work`) with three core modules tracked by Renovate:
 
 1. **`tui`**: Terminal user interface for Stellar ledger navigation, keyboard shortcuts, and transaction inspection (Bubbletea / Lipgloss stack).
-2. **`tui-indexer`**: Ingests, decodes, and indexes Soroban RPC events and ledger data for local high-speed TUI lookup.
+2. **`tui-indexer`**: Backend service that ingests Stellar data into PostgreSQL/TimescaleDB, publishes live events through Redis, and exposes an HTTP read API that `tui` uses in Hybrid and Indexer modes.
 3. **`sordecode`**: Core Soroban decoding engine, parsing binary XDR ledger entries, ScVal types, and contract storage keys.
 
 ### Policies & Scheduling
 
 - **Weekly Schedule**: Automated PR creation runs before **6:00 AM UTC on Mondays** to keep development uninterrupted during weekdays.
-- **Grouped Non-Major Updates (`group:allNonMajor`)**: All non-breaking (minor and patch) dependency bumps across Go modules and GitHub Actions are combined into grouped PRs.
+- **Grouped Updates (`packageRules`)**: Updates are grouped by `packageRules` into one `all non-major dependencies` PR (covering minor, patch, pin, and digest updates) and one `all major dependencies` PR for major bumps.
+- **Vulnerability Alerts**: `vulnerabilityAlerts` groups security fixes into one `security updates` PR.
 - **Semantic Commits**: Pull request titles and commits follow the Conventional Commits standard (`chore(deps): ...`, `fix(deps): ...`).
-- **Rate & Concurrency Limits**: Maximum 5 open PRs concurrently (`prConcurrentLimit: 5`) and 2 PRs per hour (`prHourlyLimit: 2`) to protect CI workflows.
+- **Rate & Concurrency Limits**: Maximum 3 open PRs concurrently (`prConcurrentLimit: 3`) and 2 PRs per hour (`prHourlyLimit: 2`) to protect CI workflows.
 - **Lockfile Maintenance**: Runs weekly on Mondays to re-verify `go.sum` and transitive dependencies.
 
 ## Dependency Dashboard (Issue #21) Operations
@@ -75,10 +88,12 @@ Renovate maintains Issue `#21` as an ongoing interactive Dependency Dashboard.
 When testing dependency updates across all Go workspace modules:
 
 ```bash
-# Verify Go workspace build
-go work sync
-go build ./...
+# sordecode
+cd sordecode && go vet ./... && go test ./...
 
-# Run all test suites across modules
-go test ./... -v
+# tui
+cd tui && gofmt -l . && go vet ./... && make test-all && make build
+
+# tui-indexer (needs Postgres/TimescaleDB, see infra/)
+cd tui-indexer && gofmt -l . && go vet ./... && make test && go build ./cmd/tui-indexer
 ```
