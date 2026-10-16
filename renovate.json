@@ -1,14 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    ":semanticCommits",
-    "group:allNonMajor",
-    "schedule:weekly"
-  ],
+  "extends": ["config:recommended", ":semanticCommits", "schedule:weekly"],
   "timezone": "UTC",
   "schedule": ["before 6am on monday"],
-  "prConcurrentLimit": 5,
+  "prConcurrentLimit": 3,
   "prHourlyLimit": 2,
   "labels": ["dependencies"],
   "lockFileMaintenance": {
@@ -20,5 +15,22 @@
   },
   "github-actions": {
     "enabled": true
+  },
+  "packageRules": [
+    {
+      "description": "Group every non-major update into one PR",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-non-major"
+    },
+    {
+      "description": "Group every major update into one PR",
+      "matchUpdateTypes": ["major"],
+      "groupName": "all major dependencies",
+      "groupSlug": "all-major"
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "groupName": "security updates"
   }
 }
