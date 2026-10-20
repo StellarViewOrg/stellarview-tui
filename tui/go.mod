@@ -4,8 +4,8 @@ go 1.26.0
 
 require (
 	github.com/BurntSushi/toml v1.6.0
-	github.com/charmbracelet/bubbletea v1.3.10
-	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/charmbracelet/bubbletea/v2 v2.1.0
+	github.com/charmbracelet/lipgloss/v2 v2.0.6
 	github.com/miguelnietoa/stellar-explorer/sordecode v0.0.0
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/stellar/go-stellar-sdk v0.7.3
