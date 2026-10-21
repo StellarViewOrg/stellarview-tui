@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/app"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/backendclient"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/config"
@@ -71,7 +71,7 @@ func TestLookupModelTabKeyCyclesContractWorkspace(t *testing.T) {
 	})
 
 	lookupModel := NewLookupModel(model.Snapshot(), 120, 20)
-	updated, cmd := lookupModel.Update(tea.KeyMsg{Type: tea.KeyTab})
+	_, cmd := lookupModel.Update(tea.KeyPressMsg{Code: tea.KeyTab})
 	if cmd == nil {
 		t.Fatal("expected tab action command")
 	}
@@ -79,7 +79,6 @@ func TestLookupModelTabKeyCyclesContractWorkspace(t *testing.T) {
 	if !ok || action.Kind != ActionCycleContractTab || action.Delta != 1 {
 		t.Fatalf("unexpected tab action: %#v", cmd())
 	}
-	_ = updated
 }
 
 func TestVisualModeLimitsSelectionToNavigableRows(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/app"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/config"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/livestream"
