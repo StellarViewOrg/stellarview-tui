@@ -15,6 +15,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
+	"charm.land/lipgloss/v2"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/app"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/backendclient"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/cache"
@@ -187,7 +188,7 @@ func run(args []string, stdin *os.File, stdout, stderr *os.File) int {
 				fmt.Fprintf(stderr, "persist session: %v\n", err)
 				return 1
 			}
-			fmt.Fprintln(stdout, ui.Render(model.Snapshot()))
+			lipgloss.Fprintln(stdout, ui.Render(model.Snapshot()))
 			return 0
 		}
 	}
@@ -198,7 +199,7 @@ func run(args []string, stdin *os.File, stdout, stderr *os.File) int {
 			fmt.Fprintf(stderr, "persist session: %v\n", err)
 			return 1
 		}
-		fmt.Fprintln(stdout, ui.Render(model.Snapshot()))
+		lipgloss.Fprintln(stdout, ui.Render(model.Snapshot()))
 		return 0
 	}
 

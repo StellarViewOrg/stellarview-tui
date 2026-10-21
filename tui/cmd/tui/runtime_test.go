@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/app"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/backendclient"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/config"
@@ -160,14 +160,12 @@ func TestClipboardSelectionUsesLiveFeedCopyField(t *testing.T) {
 	}
 
 	dashboard := ui.NewDashboardModel(model.Snapshot(), 100, 20)
-	updated, _ := dashboard.Update(tea.KeyMsg{Type: tea.KeyRight})
-	dashboard = updated.(ui.DashboardModel)
+	dashboard, _ = dashboard.Update(tea.KeyPressMsg{Code: tea.KeyRight})
 	if got := clipboardSelection(model.Snapshot(), &dashboard); got != "77" {
 		t.Fatalf("clipboardSelection() = %q, want %q", got, "77")
 	}
 
-	updated, _ = dashboard.Update(tea.KeyMsg{Type: tea.KeyRight})
-	dashboard = updated.(ui.DashboardModel)
+	dashboard, _ = dashboard.Update(tea.KeyPressMsg{Code: tea.KeyRight})
 	if got := clipboardSelection(model.Snapshot(), &dashboard); got != "GACCOUNT77" {
 		t.Fatalf("clipboardSelection() = %q, want %q", got, "GACCOUNT77")
 	}
@@ -190,8 +188,7 @@ func TestClipboardSelectionPrefersLookupSectionValue(t *testing.T) {
 
 	dashboard := ui.NewDashboardModel(model.Snapshot(), 100, 20)
 	for range 4 {
-		updated, _ := dashboard.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}})
-		dashboard = updated.(ui.DashboardModel)
+		dashboard, _ = dashboard.Update(tea.KeyPressMsg{Code: 'j', Text: "j"})
 	}
 
 	if got := clipboardSelection(model.Snapshot(), &dashboard); got != "GSELECTEDACCOUNT" {

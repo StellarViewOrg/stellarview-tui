@@ -3,8 +3,8 @@ package ui
 import (
 	"fmt"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/app"
 )
 
@@ -111,7 +111,7 @@ func (m DashboardModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m DashboardModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m DashboardModel) Update(msg tea.Msg) (DashboardModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = clamp(msg.Width, minWidth, 220)
@@ -127,12 +127,10 @@ func (m DashboardModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.settings.width = m.width
 		m.settings.height = m.height
 		return m, nil
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		if m.command.visible {
-			model, cmd := m.command.Update(msg)
-			if command, ok := model.(CommandPaletteModel); ok {
-				m.command = command
-			}
+			var cmd tea.Cmd
+			m.command, cmd = m.command.Update(msg)
 			return m, cmd
 		}
 		updated, cmd, handled := m.componentKeyAction(msg)
@@ -233,7 +231,7 @@ func NewHeaderModel(snapshot app.Snapshot, width int) HeaderModel {
 
 func (m HeaderModel) Init() tea.Cmd { return nil }
 
-func (m HeaderModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m HeaderModel) Update(msg tea.Msg) (HeaderModel, tea.Cmd) {
 	if msg, ok := msg.(tea.WindowSizeMsg); ok {
 		m.width = msg.Width
 	}
@@ -256,7 +254,7 @@ func NewMainModel(snapshot app.Snapshot, width, height int) MainModel {
 
 func (m MainModel) Init() tea.Cmd { return nil }
 
-func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m MainModel) Update(msg tea.Msg) (MainModel, tea.Cmd) {
 	if msg, ok := msg.(tea.WindowSizeMsg); ok {
 		m.width = msg.Width
 	}
@@ -288,11 +286,11 @@ func (m SidebarModel) WithSnapshot(snapshot app.Snapshot) SidebarModel {
 	return m
 }
 
-func (m SidebarModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m SidebarModel) Update(msg tea.Msg) (SidebarModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		switch msg.String() {
 		case "down", "j":
 			m.selected = nextSidebarScreen(m.selected, 1)
@@ -327,7 +325,7 @@ func NewBodyModel(snapshot app.Snapshot, width, height int) BodyModel {
 
 func (m BodyModel) Init() tea.Cmd { return nil }
 
-func (m BodyModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m BodyModel) Update(msg tea.Msg) (BodyModel, tea.Cmd) {
 	if msg, ok := msg.(tea.WindowSizeMsg); ok {
 		m.width = msg.Width
 	}
@@ -386,12 +384,12 @@ func (m LiveFeedModel) WithSnapshot(snapshot app.Snapshot) LiveFeedModel {
 	return m
 }
 
-func (m LiveFeedModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m LiveFeedModel) Update(msg tea.Msg) (LiveFeedModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		switch msg.String() {
 		case "down", "j":
 			m.moveSelection(1)
@@ -539,12 +537,12 @@ func (m LookupModel) WithSnapshot(snapshot app.Snapshot) LookupModel {
 	return m
 }
 
-func (m LookupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m LookupModel) Update(msg tea.Msg) (LookupModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		switch msg.String() {
 		case "down", "j":
 			m.moveSelection(1)
@@ -704,12 +702,12 @@ func (m HomeModel) WithSnapshot(snapshot app.Snapshot) HomeModel {
 	return m
 }
 
-func (m HomeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m HomeModel) Update(msg tea.Msg) (HomeModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		switch msg.String() {
 		case "down", "j":
 			m.offset++
@@ -752,12 +750,12 @@ func (m SettingsModel) WithSnapshot(snapshot app.Snapshot) SettingsModel {
 	return m
 }
 
-func (m SettingsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m SettingsModel) Update(msg tea.Msg) (SettingsModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		switch msg.String() {
 		case "down", "j":
 			m.offset++
@@ -793,7 +791,7 @@ func NewStatusModel(snapshot app.Snapshot, width, height int) StatusModel {
 
 func (m StatusModel) Init() tea.Cmd { return nil }
 
-func (m StatusModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m StatusModel) Update(msg tea.Msg) (StatusModel, tea.Cmd) {
 	if msg, ok := msg.(tea.WindowSizeMsg); ok {
 		m.width = msg.Width
 	}
@@ -815,7 +813,7 @@ func NewFooterModel(snapshot app.Snapshot, width int) FooterModel {
 
 func (m FooterModel) Init() tea.Cmd { return nil }
 
-func (m FooterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m FooterModel) Update(msg tea.Msg) (FooterModel, tea.Cmd) {
 	if msg, ok := msg.(tea.WindowSizeMsg); ok {
 		m.width = msg.Width
 	}
@@ -837,7 +835,7 @@ func NewHelpOverlayModel(snapshot app.Snapshot, width int) HelpOverlayModel {
 
 func (m HelpOverlayModel) Init() tea.Cmd { return nil }
 
-func (m HelpOverlayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m HelpOverlayModel) Update(msg tea.Msg) (HelpOverlayModel, tea.Cmd) {
 	if msg, ok := msg.(tea.WindowSizeMsg); ok {
 		m.width = msg.Width
 	}
@@ -932,11 +930,11 @@ func (m CommandPaletteModel) AppendInput(text string) CommandPaletteModel {
 	return m
 }
 
-func (m CommandPaletteModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m CommandPaletteModel) Update(msg tea.Msg) (CommandPaletteModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		switch msg.String() {
 		case "ctrl+c":
 			return m, action(ActionQuit)
@@ -982,12 +980,10 @@ func (m CommandPaletteModel) View() string {
 	return renderCommandOverlayState(m.width, m.prompt, m.input, m.results, m.selectedIndex)
 }
 
-func (m DashboardModel) componentKeyAction(msg tea.KeyMsg) (DashboardModel, tea.Cmd, bool) {
+func (m DashboardModel) componentKeyAction(msg tea.KeyPressMsg) (DashboardModel, tea.Cmd, bool) {
 	if m.snapshot.Focus == app.FocusSidebar {
-		model, cmd := m.sidebar.Update(msg)
-		if sidebar, ok := model.(SidebarModel); ok {
-			m.sidebar = sidebar
-		}
+		var cmd tea.Cmd
+		m.sidebar, cmd = m.sidebar.Update(msg)
 		switch msg.String() {
 		case "down", "j", "up", "k", "enter":
 			return m, cmd, true
@@ -1001,10 +997,8 @@ func (m DashboardModel) componentKeyAction(msg tea.KeyMsg) (DashboardModel, tea.
 
 	switch m.snapshot.Current {
 	case app.ScreenHome:
-		model, cmd := m.home.Update(msg)
-		if home, ok := model.(HomeModel); ok {
-			m.home = home
-		}
+		var cmd tea.Cmd
+		m.home, cmd = m.home.Update(msg)
 		switch msg.String() {
 		case "down", "j", "up", "k", "pgdown", "ctrl+f", "pgup", "ctrl+b", "home", "g", "end", "G":
 			return m, cmd, true
@@ -1012,10 +1006,8 @@ func (m DashboardModel) componentKeyAction(msg tea.KeyMsg) (DashboardModel, tea.
 			return m, cmd, cmd != nil
 		}
 	case app.ScreenLiveFeed:
-		model, cmd := m.liveFeed.Update(msg)
-		if liveFeed, ok := model.(LiveFeedModel); ok {
-			m.liveFeed = liveFeed
-		}
+		var cmd tea.Cmd
+		m.liveFeed, cmd = m.liveFeed.Update(msg)
 		switch msg.String() {
 		case "down", "j", "up", "k", "pgdown", "ctrl+f", "pgup", "ctrl+b", "home", "g", "end", "G", "enter", "left", "right", "[", "{", "]", "}":
 			return m, cmd, true
@@ -1023,10 +1015,8 @@ func (m DashboardModel) componentKeyAction(msg tea.KeyMsg) (DashboardModel, tea.
 			return m, cmd, cmd != nil
 		}
 	case app.ScreenLookup:
-		model, cmd := m.lookup.Update(msg)
-		if lookup, ok := model.(LookupModel); ok {
-			m.lookup = lookup
-		}
+		var cmd tea.Cmd
+		m.lookup, cmd = m.lookup.Update(msg)
 		switch msg.String() {
 		case "down", "j", "up", "k", "pgdown", "ctrl+f", "pgup", "ctrl+b", "home", "g", "end", "G", "enter", "m", ",", "-", ";", ".":
 			return m, cmd, true
@@ -1036,10 +1026,8 @@ func (m DashboardModel) componentKeyAction(msg tea.KeyMsg) (DashboardModel, tea.
 			return m, cmd, cmd != nil
 		}
 	case app.ScreenSettings:
-		model, cmd := m.settings.Update(msg)
-		if settings, ok := model.(SettingsModel); ok {
-			m.settings = settings
-		}
+		var cmd tea.Cmd
+		m.settings, cmd = m.settings.Update(msg)
 		switch msg.String() {
 		case "down", "j", "up", "k", "pgdown", "ctrl+f", "pgup", "ctrl+b", "home", "g", "end", "G":
 			return m, cmd, true

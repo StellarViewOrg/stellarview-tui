@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/app"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/backendclient"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/config"
@@ -13,7 +13,7 @@ import (
 func TestLiveFeedModelEmitsSelectionAction(t *testing.T) {
 	model := NewLiveFeedModel(app.NewModel(config.Default(), "/tmp/config.json", app.CacheSnapshot{}).Snapshot(), 100, 20)
 
-	_, cmd := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}})
+	_, cmd := model.Update(tea.KeyPressMsg{Code: 'j', Text: "j"})
 	if cmd == nil {
 		t.Fatal("expected live feed key update to return an action command")
 	}
@@ -31,7 +31,7 @@ func TestCommandPaletteModelEmitsAppendAction(t *testing.T) {
 	snapshot := app.NewModel(config.Default(), "/tmp/config.json", app.CacheSnapshot{}).Snapshot()
 	model := NewCommandPaletteModel(snapshot, 100)
 
-	_, cmd := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'x'}})
+	_, cmd := model.Update(tea.KeyPressMsg{Code: 'x', Text: "x"})
 	if cmd == nil {
 		t.Fatal("expected command palette key update to return an action command")
 	}
@@ -49,7 +49,7 @@ func TestCommandPaletteModelEmitsPasteClipboardAction(t *testing.T) {
 	snapshot := app.NewModel(config.Default(), "/tmp/config.json", app.CacheSnapshot{}).Snapshot()
 	model := NewCommandPaletteModel(snapshot, 100).Open("Search / Command", "")
 
-	_, cmd := model.Update(tea.KeyMsg{Type: tea.KeyCtrlV})
+	_, cmd := model.Update(tea.KeyPressMsg{Code: 'v', Mod: tea.ModCtrl})
 	if cmd == nil {
 		t.Fatal("expected clipboard paste action command")
 	}
@@ -73,11 +73,11 @@ func TestLiveFeedModelKeepsSelectionVisibleWithOffset(t *testing.T) {
 	}
 
 	model := NewLiveFeedModel(appModel.Snapshot(), 100, 4)
-	updated, cmd := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}})
+	var cmd tea.Cmd
+	model, cmd = model.Update(tea.KeyPressMsg{Code: 'j', Text: "j"})
 	if cmd == nil {
 		t.Fatal("expected action command")
 	}
-	model = updated.(LiveFeedModel)
 	if model.offset != 1 {
 		t.Fatalf("expected offset to advance, got %d", model.offset)
 	}
@@ -93,14 +93,12 @@ func TestLiveFeedModelTracksCopyField(t *testing.T) {
 	}
 
 	model := NewLiveFeedModel(appModel.Snapshot(), 100, 8)
-	updated, _ := model.Update(tea.KeyMsg{Type: tea.KeyRight})
-	model = updated.(LiveFeedModel)
+	model, _ = model.Update(tea.KeyPressMsg{Code: tea.KeyRight})
 	if got := model.ClipboardValue(); got != "0" {
 		t.Fatalf("ClipboardValue() = %q, want %q", got, "0")
 	}
 
-	updated, _ = model.Update(tea.KeyMsg{Type: tea.KeyRight})
-	model = updated.(LiveFeedModel)
+	model, _ = model.Update(tea.KeyPressMsg{Code: tea.KeyRight})
 	if got := model.ClipboardValue(); got != "" {
 		t.Fatalf("ClipboardValue() = %q, want empty account", got)
 	}
@@ -116,14 +114,12 @@ func TestLiveFeedModelSupportsPageAndJumpNavigation(t *testing.T) {
 	}
 
 	model := NewLiveFeedModel(appModel.Snapshot(), 100, 4)
-	updated, _ := model.Update(tea.KeyMsg{Type: tea.KeyPgDown})
-	model = updated.(LiveFeedModel)
+	model, _ = model.Update(tea.KeyPressMsg{Code: tea.KeyPgDown})
 	if model.selected <= 0 {
 		t.Fatalf("expected page navigation to advance selection, got %d", model.selected)
 	}
 
-	updated, _ = model.Update(tea.KeyMsg{Type: tea.KeyEnd})
-	model = updated.(LiveFeedModel)
+	model, _ = model.Update(tea.KeyPressMsg{Code: tea.KeyEnd})
 	if model.selected != len(appModel.Snapshot().LiveFeed.RecentTransactions)-1 {
 		t.Fatalf("expected end to jump to last row, got %d", model.selected)
 	}
@@ -149,8 +145,7 @@ func TestLookupModelMaintainsOwnSectionSelection(t *testing.T) {
 	)
 
 	model := NewLookupModel(appModel.Snapshot(), 100, 6)
-	updated, _ := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}})
-	model = updated.(LookupModel)
+	model, _ = model.Update(tea.KeyPressMsg{Code: 'j', Text: "j"})
 	if model.selectedSection == 0 {
 		t.Fatal("expected local lookup selection to move")
 	}
@@ -177,8 +172,7 @@ func TestLookupModelSkipsDividerSectionsWhenMoving(t *testing.T) {
 		t.Fatalf("expected first selectable section to be 2, got %d", model.selectedSection)
 	}
 
-	updated, _ := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}})
-	model = updated.(LookupModel)
+	model, _ = model.Update(tea.KeyPressMsg{Code: 'j', Text: "j"})
 	if model.selectedSection != 3 {
 		t.Fatalf("expected next selectable section to be 3, got %d", model.selectedSection)
 	}
@@ -200,14 +194,12 @@ func TestLookupModelSupportsPageNavigation(t *testing.T) {
 	)
 
 	model := NewLookupModel(appModel.Snapshot(), 100, 6)
-	updated, _ := model.Update(tea.KeyMsg{Type: tea.KeyPgDown})
-	model = updated.(LookupModel)
+	model, _ = model.Update(tea.KeyPressMsg{Code: tea.KeyPgDown})
 	if model.selectedSection <= 1 {
 		t.Fatalf("expected page navigation to advance selection, got %d", model.selectedSection)
 	}
 
-	updated, _ = model.Update(tea.KeyMsg{Type: tea.KeyHome})
-	model = updated.(LookupModel)
+	model, _ = model.Update(tea.KeyPressMsg{Code: tea.KeyHome})
 	if model.selectedSection != 2 {
 		t.Fatalf("expected home to jump to first selectable section, got %d", model.selectedSection)
 	}
@@ -227,8 +219,7 @@ func TestLookupModelExposesSelectedActionCommand(t *testing.T) {
 	)
 
 	model := NewLookupModel(appModel.Snapshot(), 100, 10)
-	updated, _ := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}})
-	model = updated.(LookupModel)
+	model, _ = model.Update(tea.KeyPressMsg{Code: 'j', Text: "j"})
 	if got := model.ActionCommand(); got != "lookup account GISS" {
 		t.Fatalf("ActionCommand() = %q, want issuer command", got)
 	}
@@ -251,8 +242,7 @@ func TestLookupModelSelectsOperationDetailCommand(t *testing.T) {
 
 	model := NewLookupModel(appModel.Snapshot(), 100, 40)
 	for i := 0; i < 20 && model.ActionCommand() != "lookup op tx-op-1:2"; i++ {
-		updated, _ := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}})
-		model = updated.(LookupModel)
+		model, _ = model.Update(tea.KeyPressMsg{Code: 'j', Text: "j"})
 	}
 
 	if got := model.ActionCommand(); got != "lookup op tx-op-1:2" {
@@ -290,11 +280,11 @@ func TestSidebarModelEmitsScreenActionOnEnter(t *testing.T) {
 	model := NewSidebarModel(snapshot, 30, 20)
 	model.selected = app.ScreenLookup
 
-	updated, cmd := model.Update(tea.KeyMsg{Type: tea.KeyEnter})
+	var cmd tea.Cmd
+	model, cmd = model.Update(tea.KeyPressMsg{Code: tea.KeyEnter})
 	if cmd == nil {
 		t.Fatal("expected sidebar enter to return an action")
 	}
-	model = updated.(SidebarModel)
 	if model.selected != app.ScreenLookup {
 		t.Fatalf("expected lookup to stay selected, got %q", model.selected)
 	}
@@ -313,12 +303,11 @@ func TestDashboardSidebarHandlesMovementOnlyWhenSidebarFocused(t *testing.T) {
 	appModel.FocusNextAvailable(app.FocusMain, app.FocusSidebar, app.FocusStatus)
 	model := NewDashboardModel(appModel.Snapshot(), 100, 20)
 
-	updated, cmd := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}})
+	dashboard, cmd := model.Update(tea.KeyPressMsg{Code: 'j', Text: "j"})
 	if cmd != nil {
 		t.Fatalf("expected sidebar movement to stay local, got cmd %#v", cmd)
 	}
 
-	dashboard := updated.(DashboardModel)
 	if dashboard.sidebar.selected != app.ScreenLiveFeed {
 		t.Fatalf("expected live-feed to be selected after moving down, got %q", dashboard.sidebar.selected)
 	}

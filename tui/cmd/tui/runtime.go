@@ -8,7 +8,8 @@ import (
 	"strings"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/app"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/backendclient"
 	"github.com/miguelnietoa/stellar-explorer/tui/internal/cache"
@@ -35,7 +36,6 @@ func runInteractive(cfg config.Config, model *app.Model, store *cache.Store, std
 	programModel := newTeaRuntimeModel(cfg, model, store)
 	program := tea.NewProgram(
 		programModel,
-		tea.WithAltScreen(),
 		tea.WithInput(stdin),
 		tea.WithOutput(stdout),
 	)
@@ -56,7 +56,7 @@ func (r interactiveRuntime) render(model *app.Model) error {
 	if err := persistSessionState(r.store, model.Snapshot().Current); err != nil {
 		return err
 	}
-	_, err := fmt.Fprint(r.out, ui.Render(model.Snapshot()))
+	_, err := lipgloss.Fprint(r.out, ui.Render(model.Snapshot()))
 	return err
 }
 
@@ -93,13 +93,9 @@ func (m teaRuntimeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.dashboard = m.dashboard.WithSnapshot(m.model.Snapshot())
-		if updated, _ := m.dashboard.Update(msg); updated != nil {
-			if dashboard, ok := updated.(ui.DashboardModel); ok {
-				m.dashboard = dashboard
-			}
-		}
+		m.dashboard, _ = m.dashboard.Update(msg)
 		return m, nil
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		m.dashboard = m.dashboard.WithSnapshot(m.model.Snapshot())
 		keepRunning, err := m.runtime.handleTeaKey(context.Background(), m.cfg, m.model, m.store, &m.dashboard, msg)
 		if err != nil {
@@ -146,9 +142,11 @@ func liveFeedTick() tea.Cmd {
 	})
 }
 
-func (m teaRuntimeModel) View() string {
+func (m teaRuntimeModel) View() tea.View {
 	m.dashboard = m.dashboard.WithSnapshot(m.model.Snapshot())
-	return m.dashboard.View()
+	view := tea.NewView(m.dashboard.View())
+	view.AltScreen = true
+	return view
 }
 
 func (r interactiveRuntime) handleInput(ctx context.Context, cfg config.Config, model *app.Model, input []byte) (bool, error) {
@@ -244,12 +242,10 @@ func (r interactiveRuntime) handleCommandPaletteInput(ctx context.Context, cfg c
 	}
 }
 
-func (r interactiveRuntime) handleTeaKey(ctx context.Context, cfg config.Config, model *app.Model, store *cache.Store, dashboard *ui.DashboardModel, msg tea.KeyMsg) (bool, error) {
+func (r interactiveRuntime) handleTeaKey(ctx context.Context, cfg config.Config, model *app.Model, store *cache.Store, dashboard *ui.DashboardModel, msg tea.KeyPressMsg) (bool, error) {
 	updated, cmd := dashboard.Update(msg)
-	if updatedDashboard, ok := updated.(ui.DashboardModel); ok {
-		*dashboard = updatedDashboard
-		syncLookupSelection(model, dashboard)
-	}
+	*dashboard = updated
+	syncLookupSelection(model, dashboard)
 	if cmd == nil {
 		return true, nil
 	}
