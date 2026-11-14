@@ -2,7 +2,7 @@ module github.com/miguelnietoa/stellar-explorer/sordecode
 
 go 1.25.11
 
-require github.com/stellar/go-stellar-sdk v0.8.0
+require github.com/stellar/go-stellar-sdk v0.9.0
 
 require (
 	github.com/klauspost/compress v1.18.7 // indirect
